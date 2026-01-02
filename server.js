@@ -3,6 +3,7 @@ const Sensor = require("./models/Sensor");
 
 require('dotenv').config();
 
+const port = process.env.PORT || 4000;
 const jwtSecret = process.env.JWT_SECRET;
 const mongoUri = process.env.MONGO_URI;
 
@@ -14,7 +15,6 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const port = 4000;
 
 app.use(express.json());
 

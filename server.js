@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
 const Sensor = require("./models/Sensor");
 
-mongoose.connect("mongodb+srv://karrit_db_user:BH8dykqJRbGiK13Z@clusterdemo.m1piqiq.mongodb.net/iotdb?retryWrites=true&w=majority&appName=ClusterDemo")
+require('dotenv').config();
+
+const jwtSecret = process.env.JWT_SECRET;
+const mongoUri = process.env.MONGO_URI;
+
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => console.log("✅ Connected to MongoDB Atlas"))
 .catch(err => console.error("MongoDB connection error:", err));
 
@@ -13,7 +18,7 @@ const port = 4000;
 
 app.use(express.json());
 
-const jwtKey = "your_secret_key"; // must match ESP8266 jwtKey
+const jwtKey = jwtSecret; // must match ESP8266 jwtKey
 let latestData = {};
 
 // Helper: check if timestamp is fresh

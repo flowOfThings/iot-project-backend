@@ -48,7 +48,8 @@ app.post("/api/sensor", async(req, res) => {
     const sensor = new Sensor({
       timestamp: decoded.timestamp,
       temperature: decoded.temperature,
-      humidity: decoded.humidity
+      humidity: decoded.humidity,
+      exp: decoded.exp
     });
 
     // Save to MongoDB

@@ -7,6 +7,11 @@ if (!process.env.JWT_SECRET) {
 
 const port = process.env.PORT || 4000;
 
+const cors = require("cors");
+app.use(cors({
+  origin: "https://iot-project-frontend-liard.vercel.app"
+}));
+
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("✅ Connected to MongoDB Atlas"))
 .catch(err => console.error("MongoDB connection error:", err));

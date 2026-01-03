@@ -25,6 +25,26 @@ function isTimestampValid(timestamp) {
   return Math.abs(now - timestamp) <= maxAge;
 }
 
+// Example schema
+const SensorSchema = new mongoose.Schema({
+  value: Number,
+  timestamp: { type: Date, default: Date.now }
+});
+const Sensor = mongoose.model("Sensor", SensorSchema);
+
+// Route to get latest sensor data
+app.get("/api/sensor/latest", async (req, res) => {
+  try {
+    const latest = await Sensor.findOne().sort({ timestamp: -1 });
+    if (!latest) {
+      return res.status(404).json({ message: "No sensor data found" });
+    }
+    res.json(latest);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post("/api/sensor", async(req, res) => {
   try {
     const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
@@ -55,6 +75,4 @@ app.get('/api/sensor', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

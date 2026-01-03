@@ -43,6 +43,7 @@ app.get("/api/sensor/latest", async (req, res) => {
 });
 
 app.post("/api/sensor", async(req, res) => {
+  console.log("Received body:", req.body);
   try {
     const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
     const sensor = new Sensor({

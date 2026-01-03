@@ -4,10 +4,8 @@ const Sensor = require("./models/Sensor");
 require('dotenv').config();
 
 const port = process.env.PORT || 4000;
-const jwtSecret = process.env.JWT_SECRET;
-const mongoUri = process.env.MONGO_URI;
 
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("✅ Connected to MongoDB Atlas"))
 .catch(err => console.error("MongoDB connection error:", err));
 
@@ -18,34 +16,30 @@ const app = express();
 
 app.use(express.json());
 
-const jwtKey = jwtSecret; // must match ESP8266 jwtKey
 let latestData = {};
 
 // Helper: check if timestamp is fresh
 function isTimestampValid(timestamp) {
   const now = Math.floor(Date.now() / 1000); // current epoch in seconds
-  const maxAge = 20; // allow up to n seconds difference
+  const maxAge = 3; // allow up to n seconds difference
   return Math.abs(now - timestamp) <= maxAge;
 }
 
-app.post("/api/sensor", async (req, res) => {
+app.post("/api/sensor", async(req, res) => {
   try {
-    // Verify JWT from ESP8266 payload
-    const decoded = jwt.verify(req.body.token, jwtKey);
-
-    // Create a new sensor document
+    const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
     const sensor = new Sensor({
       timestamp: decoded.timestamp,
       temperature: decoded.temperature,
       humidity: decoded.humidity
     });
 
-    // Save to MongoDB Atlas
+    // Save to MongoDB
     await sensor.save();
 
-    res.json({ status: "ok", data: decoded });
+    res.json({ success: true, data: sensor });
   } catch (err) {
-    console.error("Error saving sensor:", err);
+    console.error("Error saving sensor data:", err);
     res.status(401).json({ error: "Invalid token or save failed" });
   }
 });
@@ -58,21 +52,6 @@ app.get('/api/sensor', async (req, res) => {
   } catch (err) {
     console.error("Error fetching sensor data:", err);
     res.status(500).json({ error: "Failed to fetch sensor data" });
-  }
-});
-
-app.get("/api/test-insert", async (req, res) => {
-  try {
-    const sensor = new Sensor({
-      timestamp: Math.floor(Date.now() / 1000),
-      temperature: 21.5,
-      humidity: 60
-    });
-
-    await sensor.save();
-    res.json({ status: "ok", message: "Dummy sensor data saved!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 });
 

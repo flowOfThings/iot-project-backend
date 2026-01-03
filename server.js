@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const Sensor = require("./models/Sensor");
 
-require('dotenv').config();
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET is missing — check Render environment settings");
+}
 
 const port = process.env.PORT || 4000;
 

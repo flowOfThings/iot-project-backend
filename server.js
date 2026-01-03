@@ -13,8 +13,10 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-
 app.use(express.json());
+
+// Quick log to confirm env variable
+console.log("JWT_SECRET from env:", process.env.JWT_SECRET);
 
 let latestData = {};
 
